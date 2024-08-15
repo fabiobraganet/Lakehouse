@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  postgres:
+    extends:
+      file: ./docker/postgres-compose.yml
+      service: postgres
+
+  redis:
+    extends:
+      file: ./docker/redis-compose.yml
+      service: redis
+
+  keycloak:
+    extends:
+      file: ./docker/keycloak-compose.yml
+      service: keycloak
+
+  minio:
+    extends:
+      file: ./docker/minio-compose.yml
+      service: minio
+
+  rabbitmq:
+    extends:
+      file: ./docker/rabbitmq-compose.yml
+      service: rabbitmq
+
+  spark-master:
+    extends:
+      file: ./docker/spark-compose.yml
+      service: spark-master
+
+  spark-worker:
+    extends:
+      file: ./docker/spark-compose.yml
+      service: spark-worker
+
+  n8n:
+    extends:
+      file: ./docker/n8n-compose.yml
+      service: n8n
+
+  dremio:
+    extends:
+      file: ./docker/dremio-compose.yml
+      service: dremio
+
+  superset:
+    extends:
+      file: ./docker/superset-compose.yml
+      service: superset
+
+  budibase:
+    extends:
+      file: ./docker/budibase-compose.yml
+      service: budibase
+
+  redash:
+    extends:
+      file: ./docker/redash-compose.yml
+      service: redash
+
+networks:
+  produto_network:
+    external: true

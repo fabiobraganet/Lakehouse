@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  couchdb:
+    image: budibase/couchdb
+    container_name: couchdb
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+    networks:
+      - produto_network
+
+volumes:
+  couchdb_data:
+
+networks:
+  produto_network:
+    external: true

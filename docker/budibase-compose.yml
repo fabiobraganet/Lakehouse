@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  budibase-apps:
+    image: budibase.docker.scarf.sh/budibase/apps
+    container_name: budibase-apps
+    environment:
+      SELF_HOSTED: 1
+      COUCH_DB_URL: ${COUCHDB_URL}
+      WORKER_URL: http://budibase-worker:4003
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      INTERNAL_API_KEY: ${BUDIBASE_INTERNAL_API_KEY}
+      BUDIBASE_ENVIRONMENT: ${BUDIBASE_ENVIRONMENT}
+      PORT: 4002
+      API_ENCRYPTION_KEY: ${BUDIBASE_API_ENCRYPTION_KEY}
+      JWT_SECRET: ${BUDIBASE_JWT_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL}
+      ENABLE_ANALYTICS: ${ENABLE_ANALYTICS}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      BB_ADMIN_USER_EMAIL: ${BUDIBASE_ADMIN_USER_EMAIL}
+      BB_ADMIN_USER_PASSWORD: ${BUDIBASE_ADMIN_USER_PASSWORD}
+      PLUGINS_DIR: ${BUDIBASE_PLUGINS_DIR}
+      OFFLINE_MODE: ${BUDIBASE_OFFLINE_MODE}
+      OIDC_CLIENT_ID: ${KEYCLOAK_BUDIBASE_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${KEYCLOAK_BUDIBASE_CLIENT_SECRET}
+      OIDC_ISSUER_URL: ${KEYCLOAK_URL}/realms/${KEYCLOAK_BUDIBASE_REALM}
+      OIDC_REDIRECT_URI: ${KEYCLOAK_BUDIBASE_REDIRECT_URI}
+    depends_on:
+      - budibase-worker
+    networks:
+      - produto_network
+
+  budibase-worker:
+    image: budibase.docker.scarf.sh/budibase/worker
+    container_name: budibase-worker
+    environment:
+      SELF_HOSTED: 1
+      PORT: 4003
+      CLUSTER_PORT: ${MAIN_PORT}
+      API_ENCRYPTION_KEY: ${BUDIBASE_API_ENCRYPTION_KEY}
+      JWT_SECRET: ${BUDIBASE_JWT_SECRET}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_URL: ${MINIO_URL}
+      APPS_URL: http://budibase-apps:4002
+      COUCH_DB_USERNAME: ${COUCHDB_USER}
+      COUCH_DB_PASSWORD: ${COUCHDB_PASSWORD}
+      COUCH_DB_URL: ${COUCHDB_URL}
+      INTERNAL_API_KEY: ${BUDIBASE_INTERNAL_API_KEY}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      OFFLINE_MODE: ${BUDIBASE_OFFLINE_MODE}
+    networks:
+      - produto_network
+
+  budibase-proxy:
+    image: budibase/proxy
+    container_name: budibase-proxy
+    ports:
+      - "${MAIN_PORT}:10000"
+    environment:
+      - PROXY_RATE_LIMIT_WEBHOOKS_PER_SECOND=${PROXY_RATE_LIMIT_WEBHOOKS_PER_SECOND}
+      - PROXY_RATE_LIMIT_API_PER_SECOND=${PROXY_RATE_LIMIT_API_PER_SECOND}
+      - APPS_UPSTREAM_URL=${APPS_UPSTREAM_URL}
+      - WORKER_UPSTREAM_URL=${WORKER_UPSTREAM_URL}
+      - MINIO_UPSTREAM_URL=${MINIO_UPSTREAM_URL}
+      - COUCHDB_UPSTREAM_URL=${COUCHDB_UPSTREAM_URL}
+    depends_on:
+      - budibase-worker
+      - budibase-apps
+    networks:
+      - produto_network

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  superset:
+    image: apache/superset:2.1.0
+    container_name: superset
+    environment:
+      SUPERSET_SECRET_KEY: your_secret_key
+      SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://administrator:administrator@serverdb:5432/superset
+    ports:
+      - "8088:8088"
+    volumes:
+      - superset_data:/app/superset_home
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - produto_network
+
+volumes:
+  superset_data:
+
+networks:
+  produto_network:
+    external: true

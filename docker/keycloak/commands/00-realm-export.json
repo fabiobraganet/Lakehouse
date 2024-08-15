@@ -1,0 +1,92 @@
+{
+  "realms": [
+    {
+      "realm": "budibase-realm",
+      "displayName": "Budibase Realm",
+      "enabled": true,
+      "defaultSignatureAlgorithm": "RS256",
+      "accessTokenLifespan": 300,
+      "ssoSessionIdleTimeout": 1800,
+      "ssoSessionMaxLifespan": 36000,
+      "offlineSessionIdleTimeout": 2592000,
+      "offlineSessionMaxLifespanEnabled": false,
+      "clientSessionIdleTimeout": 0,
+      "accessCodeLifespan": 60,
+      "enabledEventTypes": [],
+      "adminEventsEnabled": true,
+      "adminEventsDetailsEnabled": true,
+      "identityProviders": [],
+      "identityProviderMappers": [],
+      "internationalizationEnabled": true,
+      "supportedLocales": ["en", "pt-BR"],
+      "requiredCredentials": ["password"],
+      "otpPolicyType": "totp",
+      "otpPolicyAlgorithm": "HmacSHA1",
+      "otpPolicyDigits": 6,
+      "otpPolicyPeriod": 30,
+      "otpPolicyLookAheadWindow": 1,
+      "otpPolicyCodeReusable": false,
+      "webAuthnPolicyRpEntityName": "keycloak",
+      "webAuthnPolicySignatureAlgorithms": ["ES256"],
+      "eventsEnabled": true,
+      "eventsListeners": ["jboss-logging"],
+      "roles": {
+        "realm": [
+          { "name": "budibase-admin", "description": "Admin role for Budibase" },
+          { "name": "budibase-user", "description": "User role for Budibase" }
+        ]
+      },
+      "users": [
+        {
+          "username": "budibase-admin",
+          "enabled": true,
+          "emailVerified": true,
+          "firstName": "Budibase",
+          "lastName": "Admin",
+          "email": "admin@budibase.com",
+          "credentials": [
+            { "type": "password", "value": "secureAdminPass", "temporary": false }
+          ],
+          "realmRoles": ["budibase-admin"]
+        },
+        {
+          "username": "budibase-user",
+          "enabled": true,
+          "emailVerified": true,
+          "firstName": "Budibase",
+          "lastName": "User",
+          "email": "user@budibase.com",
+          "credentials": [
+            { "type": "password", "value": "secureUserPass", "temporary": false }
+          ],
+          "realmRoles": ["budibase-user"]
+        }
+      ],
+      "clients": [
+        {
+          "clientId": "budibase-client",
+          "enabled": true,
+          "clientAuthenticatorType": "client-secret",
+          "secret": "budibaseClientSecret",
+          "redirectUris": ["http://budibase-apps:4002/api/global/auth/oidc/callback"],
+          "webOrigins": ["*"],
+          "protocolMappers": [
+            {
+              "name": "realm roles",
+              "protocol": "openid-connect",
+              "protocolMapper": "oidc-usermodel-realm-role-mapper",
+              "config": {
+                "multivalued": "true",
+                "userinfo.token.claim": "true",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "claim.name": "roles",
+                "jsonType.label": "String"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

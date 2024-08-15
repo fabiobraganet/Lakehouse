@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  redis:
+    extends:
+      file: ./docker/redis-compose.yml
+      service: redis
+
+  minio:
+    extends:
+      file: ./docker/minio-compose.yml
+      service: minio
+
+  couchdb:
+    extends:
+      file: ./docker/couchdb-compose.yml
+      service: couchdb
+
+  postgres:
+    extends:
+      file: ./docker/postgres-compose.yml
+      service: postgres
+
+  keycloak:
+    extends:
+      file: ./docker/keycloak-compose.yml
+      service: keycloak
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  n8n:
+    extends:
+      file: ./docker/n8n-compose.yml
+      service: n8n
+
+  budibase-apps:
+    extends:
+      file: ./docker/budibase-compose.yml
+      service: budibase-apps
+    depends_on:
+      - redis
+      - minio
+      - couchdb
+      - keycloak
+
+  budibase-worker:
+    extends:
+      file: ./docker/budibase-compose.yml
+      service: budibase-worker
+    depends_on:
+      - redis
+      - minio
+      - couchdb
+      - keycloak
+
+  budibase-proxy:
+    extends:
+      file: ./docker/budibase-compose.yml
+      service: budibase-proxy
+    depends_on:
+      - minio
+      - budibase-worker
+      - budibase-apps
+      - couchdb
+      - keycloak
+
+volumes:
+  n8n_data:
+  redis_data:
+  couchdb_data:
+  minio_data:
+  postgres_data:
+
+networks:
+  produto_network:
+    external: true
