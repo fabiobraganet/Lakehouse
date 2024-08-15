@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: serverdb
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: administrator
+      POSTGRES_PASSWORD: administrator
+    ports:
+      - '6010:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U administrator -d postgres']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backup:/backup
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/backup.sh:/backup.sh
+    networks:
+      - produto_network
+    command: >
+      bash -c "
+      cp /backup.sh /usr/local/bin/backup.sh &&
+      chmod +x /usr/local/bin/backup.sh &&
+      echo '0 */2 * * * root /usr/local/bin/backup.sh' > /etc/crontabs/root &&
+      crond &&
+      docker-entrypoint.sh postgres
+      "
+volumes:
+  postgres_data:
+
+networks:
+  produto_network:
+    external: true

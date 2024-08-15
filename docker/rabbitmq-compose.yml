@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: administrator
+      RABBITMQ_DEFAULT_PASS: administrator
+      RABBITMQ_ERLANG_COOKIE: secretcookie
+      RABBITMQ_NODENAME: rabbit@localhost
+    ports:
+      - '6013:5672'
+      - '6002:15672'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - produto_network
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  produto_network:
+    external: true
